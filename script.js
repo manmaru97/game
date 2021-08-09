@@ -1,8 +1,10 @@
 'use strict';
 
+
 // canvas
-var canvas = document.getElementById("canvas");
-var ctx = canvas.getContext("2d");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
 
 // item
 var backGround = {
@@ -16,10 +18,17 @@ var player = {
     size: 32,
 };
 
+
+// 処理（イニシャライズ）
 window.addEventListener('load', function () {
     ctx.drawImage(backGround.img, 0, 0);
 })
 
-function buttonClick() {
-    ctx.drawImage(player.img, backGround.width / 2 - player.size / 2, backGround.height - player.size * 2);
-};
+// 処理（クリック）
+canvas.addEventListener('click', function (e) {
+
+    const x = e.clientX - e.target.getBoundingClientRect().left;
+    const y = e.clientY - e.target.getBoundingClientRect().top;
+
+    ctx.drawImage(player.img, x - player.size / 2, y - player.size / 2);
+})
