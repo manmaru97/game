@@ -4,16 +4,24 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="image/playerDown.png">
     <title>ゲーム</title>
 </head>
 
 <body>
     <div class="parent">
-        <img id="backGround" src="image/backGround.png" style="display: none;">
-        <img id="player" src="image/player.png" style="display: none;">
+        <img id="title" src="image/backImageTitle.png" style="display: none;">
+        <img id="game" src="image/backImageGame.png" style="display: none;">
+        <img id="player" src="image/playerDown.png" style="display: none;">
+        <img id="blockHard" src="image/blockHard.png" style="display: none;">
+        <img id="blockSoft" src="image/blockSoft.png" style="display: none;">
         <canvas id="canvas" width="1024" height="576"></canvas>
     </div>
-    <script src="script.js"></script>
+    <script src="header.js"></script>
+    <script src="scriptTitle.js"></script>
+    <script src="scriptGame_move.js"></script>
+    <script src="scriptGame.js"></script>
+    <script src="main.js"></script>
 </body>
 
 </html>
