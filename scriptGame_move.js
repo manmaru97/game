@@ -1,17 +1,28 @@
 'use strict';
 
+function whereIsPlayer() {
+    for (let i = 0; i < objList.length; i++) {
+        if (player.y + player.height === objList[i].y &&
+            player.x < objList[i].x + objList[i].width &&
+            player.x + player.width > objList[i].x) {
+            return where.ground;
+        } else if (player.y + player.height === endOfStage.down) {
+            return where.ground;
+        }
+    }
+    return where.sky;
+}
+
 function moveUpUntilTouch(speed) {
     for (let i = 0; i < objList.length; i++) {
         if (player.y - speed < objList[i].y + objList[i].height &&
             player.y >= objList[i].y + objList[i].height &&
             player.x < objList[i].x + objList[i].width &&
             player.x + player.width > objList[i].x) {
-            player.jumpTimer.flag = false;
-            player.jumpTimer.counter = 0;
+            player.jumpFlag = false;
             return objList[i].y + objList[i].height;
-        }else if(player.y - speed < endOfStage.up){
-            player.jumpTimer.flag = false;
-            player.jumpTimer.counter = 0;
+        } else if (player.y - speed < endOfStage.up) {
+            player.jumpFlag = false;
             return endOfStage.up;
         }
     }
@@ -25,7 +36,7 @@ function moveDownUntilTouch(speed) {
             player.x < objList[i].x + objList[i].width &&
             player.x + player.width > objList[i].x) {
             return objList[i].y - player.height;
-        }else if(player.y + player.height + speed > endOfStage.down){
+        } else if (player.y + player.height + speed > endOfStage.down) {
             return endOfStage.down - player.height;
         }
     }
@@ -39,7 +50,7 @@ function moveLeftUntilTouch(speed) {
             player.y < objList[i].y + objList[i].height &&
             player.y + player.height > objList[i].y) {
             return objList[i].x + objList[i].width;
-        }else if(player.x - speed < endOfStage.left){
+        } else if (player.x - speed < endOfStage.left) {
             return endOfStage.left;
         }
     }
@@ -53,7 +64,7 @@ function moveRightUntilTouch(speed) {
             player.y < objList[i].y + objList[i].height &&
             player.y + player.height > objList[i].y) {
             return objList[i].x - player.width;
-        }else if(player.x + player.width + speed > endOfStage.right){
+        } else if (player.x + player.width + speed > endOfStage.right) {
             return endOfStage.right - player.width;
         }
     }

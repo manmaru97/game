@@ -2,19 +2,21 @@
 
 function mainLoop() {
 
+    // タイマー
     timer++;
     if (timer % fps === 0) {
         console.log(timer / fps);
-    }
-
-    window.onkeydown = function (e) {
-        if (e.key === ' ') {
-            if (pressSpace === keyPress.up) {
-                pressSpace = keyPress.down;
-            } else {
-                pressSpace = keyPress.pressed;
+        if (nowScene === scene.game) {
+            if (player.where === where.ground) {
+                console.log("ground");
+            } else if (player.where === where.sky) {
+                console.log("sky");
             }
         }
+    }
+
+    // キー入力（開始）
+    window.onkeydown = function (e) {
         if (e.key === 'ArrowUp') {
             if (pressUp === keyPress.up) {
                 pressUp = keyPress.down;
@@ -43,6 +45,27 @@ function mainLoop() {
                 pressRight = keyPress.pressed;
             }
         }
+        if (e.key === 'v') {
+            if (pressV === keyPress.up) {
+                pressV = keyPress.down;
+            } else {
+                pressV = keyPress.pressed;
+            }
+        }
+        if (e.key === 'b') {
+            if (pressB === keyPress.up) {
+                pressB = keyPress.down;
+            } else {
+                pressB = keyPress.pressed;
+            }
+        }
+        if (e.key === 't') {
+            if (pressT === keyPress.up) {
+                pressT = keyPress.down;
+            } else {
+                pressT = keyPress.pressed;
+            }
+        }
         if (e.key === 'z') {
             if (pressZ === keyPress.up) {
                 pressZ = keyPress.down;
@@ -59,46 +82,24 @@ function mainLoop() {
         }
     }
 
+    // キー入力（終了）
     window.onkeyup = function (e) {
-        if (e.key === ' ') { pressSpace = keyPress.up; }
         if (e.key === 'ArrowUp') { pressUp = keyPress.up; }
         if (e.key === 'ArrowDown') { pressDown = keyPress.up; }
         if (e.key === 'ArrowLeft') { pressLeft = keyPress.up; }
         if (e.key === 'ArrowRight') { pressRight = keyPress.up; }
+        if (e.key === 'v') { pressV = keyPress.up; }
+        if (e.key === 'b') { pressB = keyPress.up; }
+        if (e.key === 't') { pressT = keyPress.up; }
         if (e.key === 'z') { pressZ = keyPress.up; }
         if (e.key === 'x') { pressX = keyPress.up; }
     }
 
+    // シーンごとの処理
     if (nowScene === scene.title) {
-        if (pressSpace !== keyPress.up) {
-            Game_init();
-        }
+        Title_main();
     } else if (nowScene === scene.game) {
-
-        Game_always();
-
-        if (pressSpace !== keyPress.up) {
-            Game_pressSpace();
-        }
-        if (pressUp !== keyPress.up) {
-            Game_pressUp();
-        }
-        if (pressDown !== keyPress.up) {
-            Game_pressDown();
-        }
-        if (pressLeft !== keyPress.up) {
-            Game_pressLeft();
-        }
-        if (pressRight !== keyPress.up) {
-            Game_pressRight();
-        }
-        if (pressZ !== keyPress.up) {
-            Game_pressZ();
-        }
-        if (pressX !== keyPress.up) {
-            Game_pressX();
-        }
-
+        Game_main();
     }
 
     repaint();

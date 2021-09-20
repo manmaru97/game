@@ -4,19 +4,15 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-// 入力判定のenum
-let keyPress = {
-    up: Symbol(),
-    down: Symbol(),
-    pressed: Symbol(),
-};
-
 // 入力判定
-let pressSpace = keyPress.up;
+let pressSpace = keyPress.up;   // 押されていない
 let pressUp = keyPress.up;
 let pressDown = keyPress.up;
 let pressLeft = keyPress.up;
 let pressRight = keyPress.up;
+let pressV = keyPress.up;
+let pressB = keyPress.up;
+let pressT = keyPress.up;
 let pressZ = keyPress.up;
 let pressX = keyPress.up;
 
@@ -24,28 +20,19 @@ let pressX = keyPress.up;
 const size = 32;
 
 // タイマー
-let timer;
+let timer = 0;
 const fps = 60;
 
 // シーン
-let scene = { title: 0, game: 1 };
-let nowScene;
-
-// オブジェクトのタイプのenum
-let typeName = {
-    player: Symbol(),
-    enemy: Symbol(),
-    block: Symbol(),
-    item: Symbol(),
-    titleBack: Symbol(),
-    gameBack: Symbol(),
-};
+let nowScene = undefined;
 
 // オブジェクトの要素
 class Obj {
     constructor(type, img, x, y, width, height, isExist) {
         this.type = type;
         this.img = img;
+        this.img2 = undefined;
+        this.img3 = undefined;
         this.x = x;
         this.y = y;
         this.width = width;
@@ -58,19 +45,23 @@ class Obj {
 
 class Player extends Obj {
     init() {
-        this.freeFallSpeed = 8;
-        this.horizontalSpeed = 8;
-        this.upSpeed = 16;
-        this.downSpeed = 8;
-        this.jumpTimer = {
-            flag: false,
-            counter: 0,
-        };
+        this.where = undefined;
+        this.direction = direction.right;
+        this.upSpeed = 8;
+        this.downSpeed = 0.4;
+        this.downMinSpeed = 0.4;
+        this.downMaxSpeed = 8;
+        this.downAcceleration = 0.4;
+        this.horizontalSpeed = 0.4;
+        this.horizontalMaxSpeed = 8;
+        this.horizontalAcceleration = 0.4;
+        this.jumpFlag = false;
+        this.jumpTimer = undefined;
+        this.actionFlag = false;
+        this.actionTimer = undefined;
+        this.leftTimer = undefined;
+        this.rightTimer = undefined;
     }
-}
-
-class Enemy extends Obj {
-
 }
 
 // オブジェクトの配列
@@ -79,25 +70,33 @@ let backList = [
     new Obj(typeName.gameBack, document.getElementById("game"), 0, 0, canvas.width, canvas.height, false)
 ];
 let objList = [];
-let player = new Player(typeName.player, document.getElementById("player"), 0, 0, size, size, false);
+
+// プレイヤー
+let player = undefined;
 
 // カメラ
-let camera = { x: player.x, y: player.y, zoom: 1.0 }
+let camera = {
+    x: undefined,
+    y: undefined,
+    zoom: undefined,
+};
 
 // ステージの端
 let endOfStage = {
     up: 0,
-    down: canvas.height * 2, // 1024 * 2 = 2048 = 32 * 64
+    down: undefined,
     left: 0,
-    right: canvas.width * 2, // 576 * 2 = 1152 = 32 * 36
+    right: undefined,
 }
+
+document.getElementById("bgmTitle").volume = 0.5;
+document.getElementById("bgmGame").volume = 0.5;
+document.getElementById("jump").volume = 1;
+document.getElementById("attack").volume = 1;
 
 function repaint() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    camera.x = player.x + player.width / 2;
-    camera.y = player.y + player.height / 2;
 
     if (nowScene === scene.title) {
         for (let i = 0; i < backList.length; i++) {
@@ -106,6 +105,8 @@ function repaint() {
             }
         }
     } else if (nowScene === scene.game) {
+        camera.x = player.x + player.width / 2;
+        camera.y = player.y + player.height / 2;
         // 背景
         for (let i = 0; i < backList.length; i++) {
             if (backList[i].isExist === true) {
@@ -123,10 +124,17 @@ function repaint() {
         }
         // プレイヤー
         if (player.isExist === true) {
-            ctx.drawImage(player.img,
-                ((player.x - camera.x) * camera.zoom + canvas.width / 2),
-                ((player.y - camera.y) * camera.zoom + canvas.height / 2),
-                player.width * camera.zoom, player.height * camera.zoom);
+            if (player.direction === direction.left) {
+                ctx.drawImage(player.img2,
+                    ((player.x - camera.x) * camera.zoom + canvas.width / 2),
+                    ((player.y - camera.y) * camera.zoom + canvas.height / 2),
+                    player.width * camera.zoom, player.height * camera.zoom);
+            } else {
+                ctx.drawImage(player.img3,
+                    ((player.x - camera.x) * camera.zoom + canvas.width / 2),
+                    ((player.y - camera.y) * camera.zoom + canvas.height / 2),
+                    player.width * camera.zoom, player.height * camera.zoom);
+            }
         }
     }
 }
