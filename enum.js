@@ -16,6 +16,7 @@ let typeName = {
     player: Symbol(),
     enemy: Symbol(),
     block: Symbol(),
+    board: Symbol(),
     item: Symbol(),
     titleBack: Symbol(),
     gameBack: Symbol(),

@@ -105,8 +105,37 @@ function repaint() {
             }
         }
     } else if (nowScene === scene.game) {
-        camera.x = player.x + player.width / 2;
-        camera.y = player.y + player.height / 2;
+        // カメラ
+        if (player.x + player.width / 2 <= (canvas.width / 2) / camera.zoom) {
+            if (endOfStage.right * camera.zoom < canvas.width) {
+                camera.x = endOfStage.right / 2;
+            } else {
+                camera.x = (canvas.width / 2) / camera.zoom;
+            }
+        } else if (player.x + player.width / 2 >= endOfStage.right - (canvas.width / 2) / camera.zoom) {
+            if (endOfStage.right * camera.zoom < canvas.width) {
+                camera.x = endOfStage.right / 2;
+            } else {
+                camera.x = endOfStage.right - (canvas.width / 2) / camera.zoom;
+            }
+        } else {
+            camera.x = player.x + player.width / 2;
+        }
+        if (player.y + player.height / 2 <= (canvas.height / 2) / camera.zoom) {
+            if (endOfStage.down * camera.zoom < canvas.height) {
+                camera.y = endOfStage.down / 2;
+            } else {
+                camera.y = (canvas.height / 2) / camera.zoom;
+            }
+        } else if (player.y + player.height / 2 >= endOfStage.down - (canvas.height / 2) / camera.zoom) {
+            if (endOfStage.down * camera.zoom < canvas.height) {
+                camera.y = endOfStage.down / 2;
+            } else {
+                camera.y = endOfStage.down - (canvas.height / 2) / camera.zoom;
+            }
+        } else {
+            camera.y = player.y + player.height / 2;
+        }
         // 背景
         for (let i = 0; i < backList.length; i++) {
             if (backList[i].isExist === true) {

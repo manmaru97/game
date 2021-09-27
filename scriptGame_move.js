@@ -15,7 +15,8 @@ function whereIsPlayer() {
 
 function moveUpUntilTouch(speed) {
     for (let i = 0; i < objList.length; i++) {
-        if (player.y - speed < objList[i].y + objList[i].height &&
+        if (objList[i].type === typeName.block &&
+            player.y - speed < objList[i].y + objList[i].height &&
             player.y >= objList[i].y + objList[i].height &&
             player.x < objList[i].x + objList[i].width &&
             player.x + player.width > objList[i].x) {
@@ -31,7 +32,12 @@ function moveUpUntilTouch(speed) {
 
 function moveDownUntilTouch(speed) {
     for (let i = 0; i < objList.length; i++) {
-        if (player.y + player.height + speed > objList[i].y &&
+        if (
+            (
+                objList[i].type === typeName.block ||
+                (objList[i].type === typeName.board && pressDown === keyPress.up)
+            ) &&
+            player.y + player.height + speed > objList[i].y &&
             player.y + player.height <= objList[i].y &&
             player.x < objList[i].x + objList[i].width &&
             player.x + player.width > objList[i].x) {
@@ -45,7 +51,8 @@ function moveDownUntilTouch(speed) {
 
 function moveLeftUntilTouch(speed) {
     for (let i = 0; i < objList.length; i++) {
-        if (player.x - speed < objList[i].x + objList[i].width &&
+        if (objList[i].type === typeName.block &&
+            player.x - speed < objList[i].x + objList[i].width &&
             player.x >= objList[i].x + objList[i].width &&
             player.y < objList[i].y + objList[i].height &&
             player.y + player.height > objList[i].y) {
@@ -59,7 +66,8 @@ function moveLeftUntilTouch(speed) {
 
 function moveRightUntilTouch(speed) {
     for (let i = 0; i < objList.length; i++) {
-        if (player.x + player.width + speed > objList[i].x &&
+        if (objList[i].type === typeName.block &&
+            player.x + player.width + speed > objList[i].x &&
             player.x + player.width <= objList[i].x &&
             player.y < objList[i].y + objList[i].height &&
             player.y + player.height > objList[i].y) {

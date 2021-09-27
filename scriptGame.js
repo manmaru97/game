@@ -5,6 +5,9 @@ function Game_main() {
 
     Game_always();
 
+    if (pressDown !== keyPress.up) {
+        Game_pressDown();
+    }
     if (pressLeft !== keyPress.up) {
         Game_pressLeft();
     }
@@ -35,6 +38,8 @@ function setMap(type, xNum, yNum) {
         player.y = size * yNum;
     } else if (type === typeName.block) {
         objList.push(new Obj(typeName.block, document.getElementById("blockSoft"), size * xNum, size * yNum, size, size, true));
+    } else if (type === typeName.board) {
+        objList.push(new Obj(typeName.board, document.getElementById("board"), size * xNum, size * yNum, size, size, true));
     }
 }
 
@@ -67,6 +72,8 @@ function Game_init() {
                 setMap(typeName.player, j, i);
             } else if (map[i][j] === 2) {
                 setMap(typeName.block, j, i);
+            } else if (map[i][j] === 3) {
+                setMap(typeName.board, j, i);
             }
         }
     }
@@ -120,8 +127,9 @@ function Game_always() {
     } else {
         player.y = moveDownUntilTouch(player.downSpeed);
     }
+}
 
-    // 攻撃
+function Game_pressDown() {
 }
 
 function Game_pressLeft() {
