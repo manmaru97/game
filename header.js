@@ -65,10 +65,10 @@ class Player extends Obj {
 }
 
 // オブジェクトの配列
-let backList = [
-    new Obj(typeName.titleBack, document.getElementById("title"), 0, 0, canvas.width, canvas.height, false),
-    new Obj(typeName.gameBack, document.getElementById("game"), 0, 0, canvas.width, canvas.height, false)
+let titleBackList = [
+    new Obj(typeName.titleBack, document.getElementById("title"), 0, 0, canvas.width, canvas.height, true),
 ];
+let gameBackList = [];
 let objList = [];
 
 // プレイヤー
@@ -99,47 +99,42 @@ function repaint() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     if (nowScene === scene.title) {
-        for (let i = 0; i < backList.length; i++) {
-            if (backList[i].isExist === true) {
-                ctx.drawImage(backList[i].img, backList[i].x, backList[i].y, backList[i].width, backList[i].height);
+        for (let i = 0; i < titleBackList.length; i++) {
+            if (titleBackList[i].isExist === true) {
+                ctx.drawImage(titleBackList[i].img, titleBackList[i].x, titleBackList[i].y, titleBackList[i].width, titleBackList[i].height);
             }
         }
     } else if (nowScene === scene.game) {
         // カメラ
-        if (player.x + player.width / 2 <= (canvas.width / 2) / camera.zoom) {
-            if (endOfStage.right * camera.zoom < canvas.width) {
-                camera.x = endOfStage.right / 2;
-            } else {
-                camera.x = (canvas.width / 2) / camera.zoom;
-            }
+        if (endOfStage.right * camera.zoom < canvas.width) {
+            camera.x = endOfStage.right / 2;
+        } else if (player.x + player.width / 2 <= (canvas.width / 2) / camera.zoom) {
+            camera.x = (canvas.width / 2) / camera.zoom;
         } else if (player.x + player.width / 2 >= endOfStage.right - (canvas.width / 2) / camera.zoom) {
-            if (endOfStage.right * camera.zoom < canvas.width) {
-                camera.x = endOfStage.right / 2;
-            } else {
-                camera.x = endOfStage.right - (canvas.width / 2) / camera.zoom;
-            }
+            camera.x = endOfStage.right - (canvas.width / 2) / camera.zoom;
         } else {
             camera.x = player.x + player.width / 2;
         }
-        if (player.y + player.height / 2 <= (canvas.height / 2) / camera.zoom) {
-            if (endOfStage.down * camera.zoom < canvas.height) {
-                camera.y = endOfStage.down / 2;
-            } else {
-                camera.y = (canvas.height / 2) / camera.zoom;
-            }
+        if (endOfStage.down * camera.zoom < canvas.height) {
+            camera.y = endOfStage.down / 2;
+        } else if (player.y + player.height / 2 <= (canvas.height / 2) / camera.zoom) {
+            camera.y = (canvas.height / 2) / camera.zoom;
         } else if (player.y + player.height / 2 >= endOfStage.down - (canvas.height / 2) / camera.zoom) {
-            if (endOfStage.down * camera.zoom < canvas.height) {
-                camera.y = endOfStage.down / 2;
-            } else {
-                camera.y = endOfStage.down - (canvas.height / 2) / camera.zoom;
-            }
+            camera.y = endOfStage.down - (canvas.height / 2) / camera.zoom;
         } else {
             camera.y = player.y + player.height / 2;
         }
-        // 背景
-        for (let i = 0; i < backList.length; i++) {
-            if (backList[i].isExist === true) {
-                ctx.drawImage(backList[i].img, backList[i].x, backList[i].y, backList[i].width, backList[i].height);
+        // 黒背景
+        for (let i = 0; i < gameBackList.length; i++) {
+            if (gameBackList[i].isExist === true) {
+                if (gameBackList[i].type === typeName.black) {
+                    ctx.drawImage(gameBackList[i].img, gameBackList[i].x, gameBackList[i].y, gameBackList[i].width, gameBackList[i].height);
+                } else if (gameBackList[i].type === typeName.gameBack) {
+                    ctx.drawImage(gameBackList[i].img,
+                        ((gameBackList[i].x - camera.x) * camera.zoom + canvas.width / 2),
+                        ((gameBackList[i].y - camera.y) * camera.zoom + canvas.height / 2),
+                        gameBackList[i].width * camera.zoom, gameBackList[i].height * camera.zoom);
+                }
             }
         }
         // オブジェクト
@@ -154,12 +149,12 @@ function repaint() {
         // プレイヤー
         if (player.isExist === true) {
             if (player.direction === direction.left) {
-                ctx.drawImage(player.img2,
+                ctx.drawImage(player.img,
                     ((player.x - camera.x) * camera.zoom + canvas.width / 2),
                     ((player.y - camera.y) * camera.zoom + canvas.height / 2),
                     player.width * camera.zoom, player.height * camera.zoom);
             } else {
-                ctx.drawImage(player.img3,
+                ctx.drawImage(player.img2,
                     ((player.x - camera.x) * camera.zoom + canvas.width / 2),
                     ((player.y - camera.y) * camera.zoom + canvas.height / 2),
                     player.width * camera.zoom, player.height * camera.zoom);

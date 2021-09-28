@@ -51,19 +51,10 @@ function Game_init() {
     document.getElementById("bgmTitle").currentTime = 0;
     document.getElementById("bgmGame").play();
 
-    player = new Player(typeName.player, document.getElementById("player"), undefined, undefined, size, size, false);
-    player.img2 = document.getElementById("playerLeft");
-    player.img3 = document.getElementById("playerRight");
+    player = new Player(typeName.player, document.getElementById("playerLeft"), undefined, undefined, size, size, true);
+    player.img2 = document.getElementById("playerRight");
 
     camera.zoom = 1.0;
-
-    for (let i = 0; i < backList.length; i++) {
-        if (backList[i].type === typeName.titleBack) {
-            backList[i].isExist = false;
-        } else if (backList[i].type === typeName.gameBack) {
-            backList[i].isExist = true;
-        }
-    }
 
     objList = []; // 配列のリセット
     for (let i = 0; i < map.length; i++) {
@@ -80,7 +71,8 @@ function Game_init() {
     endOfStage.right = size * map[0].length;
     endOfStage.down = size * map.length;
 
-    player.isExist = true;
+    gameBackList.push(new Obj(typeName.black, document.getElementById("black"), 0, 0, endOfStage.right, endOfStage.down, true));
+    gameBackList.push(new Obj(typeName.gameBack, document.getElementById("game"), 0, 0, endOfStage.right, endOfStage.down, true));
 
 }
 

@@ -21,12 +21,4 @@ function Title_init() {
         document.getElementById("bgmTitle").play();
     }
 
-    for (let i = 0; i < backList.length; i++) {
-        if (backList[i].type === typeName.titleBack) {
-            backList[i].isExist = true;
-        } else if (backList[i].type === typeName.gameBack) {
-            backList[i].isExist = false;
-        }
-    }
-
 }
