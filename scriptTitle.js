@@ -21,4 +21,6 @@ function Title_init() {
         document.getElementById("bgmTitle").play();
     }
 
+    titleBackList.push(new Obj(typeName.titleBack, document.getElementById("title"), 0, 0, canvas.width, canvas.height, 0, 0, 0, 0, true));
+
 }

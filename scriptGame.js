@@ -6,28 +6,60 @@ function Game_main() {
     Game_always();
 
     if (pressDown !== keyPress.up) {
-        Game_pressDown();
+        if (pressDown === keyPress.down) {
+            Game_firstPressDown();
+            pressDown = keyPress.pressed;
+        }
+        Game_pressingDown();
     }
     if (pressLeft !== keyPress.up) {
-        Game_pressLeft();
+        if (pressLeft === keyPress.down) {
+            Game_firstPressLeft();
+            pressLeft = keyPress.pressed;
+        }
+        Game_pressingLeft();
     }
     if (pressRight !== keyPress.up) {
-        Game_pressRight();
+        if (pressRight === keyPress.down) {
+            Game_firstPressRight();
+            pressRight = keyPress.pressed;
+        }
+        Game_pressingRight();
     }
     if (pressV !== keyPress.up) {
-        Game_pressV();
+        if (pressV === keyPress.down) {
+            Game_firstPressV();
+            pressV = keyPress.pressed;
+        }
+        Game_pressingV();
     }
     if (pressB !== keyPress.up) {
-        Game_pressB();
+        if (pressB === keyPress.down) {
+            Game_firstPressB();
+            pressB = keyPress.pressed;
+        }
+        Game_pressingB();
     }
     if (pressT !== keyPress.up) {
-        Game_pressT();
+        if (pressT === keyPress.down) {
+            Game_firstPressT();
+            pressT = keyPress.pressed;
+        }
+        Game_pressingT();
     }
     if (pressZ !== keyPress.up) {
-        Game_pressZ();
+        if (pressZ === keyPress.down) {
+            Game_firstPressZ();
+            pressZ = keyPress.pressed;
+        }
+        Game_pressingZ();
     }
     if (pressX !== keyPress.up) {
-        Game_pressX();
+        if (pressX === keyPress.down) {
+            Game_firstPressX();
+            pressX = keyPress.pressed;
+        }
+        Game_pressingX();
     }
 
 }
@@ -37,9 +69,9 @@ function setMap(type, xNum, yNum) {
         player.x = size * xNum;
         player.y = size * yNum;
     } else if (type === typeName.block) {
-        objList.push(new Obj(typeName.block, document.getElementById("blockSoft"), size * xNum, size * yNum, size, size, true));
+        objList.push(new Obj(typeName.block, document.getElementById("blockSoft"), size * xNum, size * yNum, size, size, 0, 0, 0, 0, true));
     } else if (type === typeName.board) {
-        objList.push(new Obj(typeName.board, document.getElementById("board"), size * xNum, size * yNum, size, size, true));
+        objList.push(new Obj(typeName.board, document.getElementById("board"), size * xNum, size * yNum, size, size, 0, 0, 0, 0, true));
     }
 }
 
@@ -51,7 +83,7 @@ function Game_init() {
     document.getElementById("bgmTitle").currentTime = 0;
     document.getElementById("bgmGame").play();
 
-    player = new Player(typeName.player, document.getElementById("playerLeft"), undefined, undefined, size, size, true);
+    player = new Player(typeName.player, document.getElementById("playerLeft"), undefined, undefined, size, size, 8, 0, 4, 4, true);
     player.img2 = document.getElementById("playerRight");
 
     camera.zoom = 1.0;
@@ -71,8 +103,8 @@ function Game_init() {
     endOfStage.right = size * map[0].length;
     endOfStage.down = size * map.length;
 
-    gameBackList.push(new Obj(typeName.black, document.getElementById("black"), 0, 0, endOfStage.right, endOfStage.down, true));
-    gameBackList.push(new Obj(typeName.gameBack, document.getElementById("game"), 0, 0, endOfStage.right, endOfStage.down, true));
+    gameBackList.push(new Obj(typeName.black, document.getElementById("black"), 0, 0, endOfStage.right, endOfStage.down, 0, 0, 0, 0, true));
+    gameBackList.push(new Obj(typeName.gameBack, document.getElementById("game"), 0, 0, endOfStage.right, endOfStage.down, 0, 0, 0, 0, true));
 
 }
 
@@ -121,78 +153,77 @@ function Game_always() {
     }
 }
 
-function Game_pressDown() {
+function Game_firstPressDown() {
+}
+function Game_pressingDown() {
 }
 
-function Game_pressLeft() {
+function Game_firstPressLeft() {
     if (player.actionFlag === false) {
-        if (pressLeft === keyPress.down) {
-            player.leftTimer = timer;
-            pressLeft = keyPress.pressed;
-        }
-        if (pressRight === keyPress.up ||
-            player.leftTimer >= player.rightTimer) {
+        player.leftTimer = timer;
+    }
+}
+function Game_pressingLeft() {
+    if (pressRight === keyPress.up ||
+        player.leftTimer >= player.rightTimer) {
+        if (player.actionFlag === false) {
             player.direction = direction.left;
             player.x = moveLeftUntilTouch(player.horizontalSpeed);
         }
     }
 }
 
-function Game_pressRight() {
+function Game_firstPressRight() {
     if (player.actionFlag === false) {
-        if (pressRight === keyPress.down) {
-            player.rightTimer = timer;
-            pressRight = keyPress.pressed;
-        }
-        if (pressLeft === keyPress.up ||
-            player.rightTimer > player.leftTimer) {
+        player.rightTimer = timer;
+    }
+}
+function Game_pressingRight() {
+    if (pressLeft === keyPress.up ||
+        player.rightTimer > player.leftTimer) {
+        if (player.actionFlag === false) {
             player.direction = direction.right;
             player.x = moveRightUntilTouch(player.horizontalSpeed);
         }
     }
 }
 
-function Game_pressV() {
-    if (pressV === keyPress.down) {
-        player.jumpFlag = true;
-        player.jumpTimer = timer;
-        player.actionFlag = false;
-        document.getElementById("jump").load();
-        document.getElementById("jump").play();
-        pressV = keyPress.pressed;
-    }
+function Game_firstPressV() {
+    player.jumpFlag = true;
+    player.jumpTimer = timer;
+    player.actionFlag = false;
+    document.getElementById("jump").load();
+    document.getElementById("jump").play();
+}
+function Game_pressingV() {
 }
 
-function Game_pressB() {
-    if (pressB === keyPress.down) {
-        player.actionFlag = true;
-        player.actionTimer = timer;
-        document.getElementById("attack").load();
-        document.getElementById("attack").play();
-        pressB = keyPress.pressed;
-    }
+function Game_firstPressB() {
+    player.actionFlag = true;
+    player.actionTimer = timer;
+    document.getElementById("attack").load();
+    document.getElementById("attack").play();
+}
+function Game_pressingB() {
 }
 
-function Game_pressT() {
-    if (pressT === keyPress.down) {
-        pressT = keyPress.pressed;
-        Title_init();
-    }
+function Game_firstPressT() {
+    Title_init();
+}
+function Game_pressingT() {
 }
 
-function Game_pressZ() {
-    if (pressZ === keyPress.down) {
-        pressZ = keyPress.pressed;
-    }
+function Game_firstPressZ() {
+}
+function Game_pressingZ() {
     if (camera.zoom < 3) {
         camera.zoom *= 1.01;
     }
 }
 
-function Game_pressX() {
-    if (pressX === keyPress.down) {
-        pressX = keyPress.pressed;
-    }
+function Game_firstPressX() {
+}
+function Game_pressingX() {
     if (camera.zoom > 0) {
         camera.zoom /= 1.01;
     }

@@ -2,11 +2,11 @@
 
 function whereIsPlayer() {
     for (let i = 0; i < objList.length; i++) {
-        if (player.y + player.height === objList[i].y &&
-            player.x < objList[i].x + objList[i].width &&
-            player.x + player.width > objList[i].x) {
+        if (player.realDown() === objList[i].realUp() &&
+            player.realLeft() < objList[i].realRight() &&
+            player.realRight() > objList[i].realLeft()) {
             return where.ground;
-        } else if (player.y + player.height === endOfStage.down) {
+        } else if (player.realDown() === endOfStage.down) {
             return where.ground;
         }
     }
@@ -16,18 +16,18 @@ function whereIsPlayer() {
 function moveUpUntilTouch(speed) {
     for (let i = 0; i < objList.length; i++) {
         if (objList[i].type === typeName.block &&
-            player.y - speed < objList[i].y + objList[i].height &&
-            player.y >= objList[i].y + objList[i].height &&
-            player.x < objList[i].x + objList[i].width &&
-            player.x + player.width > objList[i].x) {
+            player.realUp() - speed < objList[i].realDown() &&
+            player.realUp() >= objList[i].realDown() &&
+            player.realLeft() < objList[i].realRight() &&
+            player.realRight() > objList[i].realLeft()) {
             player.jumpFlag = false;
-            return objList[i].y + objList[i].height;
-        } else if (player.y - speed < endOfStage.up) {
+            return objList[i].realDown() - player.upGap;
+        } else if (player.realUp() - speed < endOfStage.up) {
             player.jumpFlag = false;
-            return endOfStage.up;
+            return endOfStage.up - player.upGap;
         }
     }
-    return player.y -= speed;
+    return player.realUp() - speed - player.upGap;
 }
 
 function moveDownUntilTouch(speed) {
@@ -37,44 +37,44 @@ function moveDownUntilTouch(speed) {
                 objList[i].type === typeName.block ||
                 (objList[i].type === typeName.board && pressDown === keyPress.up)
             ) &&
-            player.y + player.height + speed > objList[i].y &&
-            player.y + player.height <= objList[i].y &&
-            player.x < objList[i].x + objList[i].width &&
-            player.x + player.width > objList[i].x) {
-            return objList[i].y - player.height;
-        } else if (player.y + player.height + speed > endOfStage.down) {
-            return endOfStage.down - player.height;
+            player.realDown() + speed > objList[i].realUp() &&
+            player.realDown() <= objList[i].realUp() &&
+            player.realLeft() < objList[i].realRight() &&
+            player.realRight() > objList[i].realLeft()) {
+            return objList[i].realUp() - player.realHeight() - player.upGap;
+        } else if (player.realDown() + speed > endOfStage.down) {
+            return endOfStage.down - player.realHeight() - player.upGap;
         }
     }
-    return player.y += speed;
+    return player.realUp() + speed - player.upGap;
 }
 
 function moveLeftUntilTouch(speed) {
     for (let i = 0; i < objList.length; i++) {
         if (objList[i].type === typeName.block &&
-            player.x - speed < objList[i].x + objList[i].width &&
-            player.x >= objList[i].x + objList[i].width &&
-            player.y < objList[i].y + objList[i].height &&
-            player.y + player.height > objList[i].y) {
-            return objList[i].x + objList[i].width;
-        } else if (player.x - speed < endOfStage.left) {
-            return endOfStage.left;
+            player.realLeft() - speed < objList[i].realRight() &&
+            player.realLeft() >= objList[i].realRight() &&
+            player.realUp() < objList[i].realDown() &&
+            player.realDown() > objList[i].realUp()) {
+            return objList[i].realRight() - player.leftGap;
+        } else if (player.realLeft() - speed < endOfStage.left) {
+            return endOfStage.left - player.leftGap;
         }
     }
-    return player.x -= speed;
+    return player.realLeft() - speed - player.leftGap;
 }
 
 function moveRightUntilTouch(speed) {
     for (let i = 0; i < objList.length; i++) {
         if (objList[i].type === typeName.block &&
-            player.x + player.width + speed > objList[i].x &&
-            player.x + player.width <= objList[i].x &&
-            player.y < objList[i].y + objList[i].height &&
-            player.y + player.height > objList[i].y) {
-            return objList[i].x - player.width;
-        } else if (player.x + player.width + speed > endOfStage.right) {
-            return endOfStage.right - player.width;
+            player.realRight() + speed > objList[i].realLeft() &&
+            player.realRight() <= objList[i].realLeft() &&
+            player.realUp() < objList[i].realDown() &&
+            player.realDown() > objList[i].realUp()) {
+            return objList[i].realLeft() - player.realWidth() - player.leftGap;
+        } else if (player.realRight() + speed > endOfStage.right) {
+            return endOfStage.right - player.realWidth() - player.leftGap;
         }
     }
-    return player.x += speed;
+    return player.realLeft() + speed - player.leftGap;
 }

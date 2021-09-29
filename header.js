@@ -28,7 +28,8 @@ let nowScene = undefined;
 
 // オブジェクトの要素
 class Obj {
-    constructor(type, img, x, y, width, height, isExist) {
+
+    constructor(type, img, x, y, width, height, upGap, downGap, leftGap, rightGap, isExist) {
         this.type = type;
         this.img = img;
         this.img2 = undefined;
@@ -37,10 +38,30 @@ class Obj {
         this.y = y;
         this.width = width;
         this.height = height;
+        this.upGap = upGap;
+        this.downGap = downGap;
+        this.leftGap = leftGap;
+        this.rightGap = rightGap;
         this.isExist = isExist;
         this.init();
     }
-    init() { };
+
+    init() { }
+
+    up() { return (this.y); }
+    down() { return (this.y + this.height); }
+    left() { return (this.x); }
+    right() { return (this.x + this.width); }
+    centerX() { return (this.x + this.width / 2); }
+    centerY() { return (this.y + this.height / 2); }
+
+    realUp() { return (this.y + this.upGap); }
+    realDown() { return (this.y + this.height - this.downGap); }
+    realLeft() { return (this.x + this.leftGap); }
+    realRight() { return (this.x + this.width - this.rightGap); }
+    realWidth() { return (this.width - this.leftGap - this.rightGap); }
+    realHeight() { return (this.height - this.upGap - this.downGap); }
+
 }
 
 class Player extends Obj {
@@ -65,9 +86,7 @@ class Player extends Obj {
 }
 
 // オブジェクトの配列
-let titleBackList = [
-    new Obj(typeName.titleBack, document.getElementById("title"), 0, 0, canvas.width, canvas.height, true),
-];
+let titleBackList = [];
 let gameBackList = [];
 let objList = [];
 
@@ -101,38 +120,38 @@ function repaint() {
     if (nowScene === scene.title) {
         for (let i = 0; i < titleBackList.length; i++) {
             if (titleBackList[i].isExist === true) {
-                ctx.drawImage(titleBackList[i].img, titleBackList[i].x, titleBackList[i].y, titleBackList[i].width, titleBackList[i].height);
+                ctx.drawImage(titleBackList[i].img, titleBackList[i].left(), titleBackList[i].up(), titleBackList[i].width, titleBackList[i].height);
             }
         }
     } else if (nowScene === scene.game) {
         // カメラ
         if (endOfStage.right * camera.zoom < canvas.width) {
             camera.x = endOfStage.right / 2;
-        } else if (player.x + player.width / 2 <= (canvas.width / 2) / camera.zoom) {
+        } else if (player.centerX() <= (canvas.width / 2) / camera.zoom) {
             camera.x = (canvas.width / 2) / camera.zoom;
-        } else if (player.x + player.width / 2 >= endOfStage.right - (canvas.width / 2) / camera.zoom) {
+        } else if (player.centerX() >= endOfStage.right - (canvas.width / 2) / camera.zoom) {
             camera.x = endOfStage.right - (canvas.width / 2) / camera.zoom;
         } else {
-            camera.x = player.x + player.width / 2;
+            camera.x = player.centerX();
         }
         if (endOfStage.down * camera.zoom < canvas.height) {
             camera.y = endOfStage.down / 2;
-        } else if (player.y + player.height / 2 <= (canvas.height / 2) / camera.zoom) {
+        } else if (player.centerY() <= (canvas.height / 2) / camera.zoom) {
             camera.y = (canvas.height / 2) / camera.zoom;
-        } else if (player.y + player.height / 2 >= endOfStage.down - (canvas.height / 2) / camera.zoom) {
+        } else if (player.centerY() >= endOfStage.down - (canvas.height / 2) / camera.zoom) {
             camera.y = endOfStage.down - (canvas.height / 2) / camera.zoom;
         } else {
-            camera.y = player.y + player.height / 2;
+            camera.y = player.centerY();
         }
         // 黒背景
         for (let i = 0; i < gameBackList.length; i++) {
             if (gameBackList[i].isExist === true) {
                 if (gameBackList[i].type === typeName.black) {
-                    ctx.drawImage(gameBackList[i].img, gameBackList[i].x, gameBackList[i].y, gameBackList[i].width, gameBackList[i].height);
+                    ctx.drawImage(gameBackList[i].img, gameBackList[i].left(), gameBackList[i].up(), gameBackList[i].width, gameBackList[i].height);
                 } else if (gameBackList[i].type === typeName.gameBack) {
                     ctx.drawImage(gameBackList[i].img,
-                        ((gameBackList[i].x - camera.x) * camera.zoom + canvas.width / 2),
-                        ((gameBackList[i].y - camera.y) * camera.zoom + canvas.height / 2),
+                        ((gameBackList[i].left() - camera.x) * camera.zoom + canvas.width / 2),
+                        ((gameBackList[i].up() - camera.y) * camera.zoom + canvas.height / 2),
                         gameBackList[i].width * camera.zoom, gameBackList[i].height * camera.zoom);
                 }
             }
@@ -141,8 +160,8 @@ function repaint() {
         for (let i = 0; i < objList.length; i++) {
             if (objList[i].isExist === true) {
                 ctx.drawImage(objList[i].img,
-                    ((objList[i].x - camera.x) * camera.zoom + canvas.width / 2),
-                    ((objList[i].y - camera.y) * camera.zoom + canvas.height / 2),
+                    ((objList[i].left() - camera.x) * camera.zoom + canvas.width / 2),
+                    ((objList[i].up() - camera.y) * camera.zoom + canvas.height / 2),
                     objList[i].width * camera.zoom, objList[i].height * camera.zoom);
             }
         }
@@ -150,13 +169,13 @@ function repaint() {
         if (player.isExist === true) {
             if (player.direction === direction.left) {
                 ctx.drawImage(player.img,
-                    ((player.x - camera.x) * camera.zoom + canvas.width / 2),
-                    ((player.y - camera.y) * camera.zoom + canvas.height / 2),
+                    ((player.left() - camera.x) * camera.zoom + canvas.width / 2),
+                    ((player.up() - camera.y) * camera.zoom + canvas.height / 2),
                     player.width * camera.zoom, player.height * camera.zoom);
             } else {
                 ctx.drawImage(player.img2,
-                    ((player.x - camera.x) * camera.zoom + canvas.width / 2),
-                    ((player.y - camera.y) * camera.zoom + canvas.height / 2),
+                    ((player.left() - camera.x) * camera.zoom + canvas.width / 2),
+                    ((player.up() - camera.y) * camera.zoom + canvas.height / 2),
                     player.width * camera.zoom, player.height * camera.zoom);
             }
         }
