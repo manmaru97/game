@@ -22,12 +22,12 @@ function moveUpUntilTouch(speed) {
             player.realRight() > objList[i].realLeft()) {
             player.jumpFlag = false;
             return objList[i].realDown() - player.upGap;
-        } else if (player.realUp() - speed < endOfStage.up) {
+        } else if (player.up() - speed < endOfStage.up) {
             player.jumpFlag = false;
-            return endOfStage.up - player.upGap;
+            return endOfStage.up;
         }
     }
-    return player.realUp() - speed - player.upGap;
+    return player.up() - speed;
 }
 
 function moveDownUntilTouch(speed) {
@@ -42,11 +42,11 @@ function moveDownUntilTouch(speed) {
             player.realLeft() < objList[i].realRight() &&
             player.realRight() > objList[i].realLeft()) {
             return objList[i].realUp() - player.realHeight() - player.upGap;
-        } else if (player.realDown() + speed > endOfStage.down) {
-            return endOfStage.down - player.realHeight() - player.upGap;
+        } else if (player.down() + speed >= endOfStage.down) {
+            return endOfStage.down - player.height;
         }
     }
-    return player.realUp() + speed - player.upGap;
+    return player.up() + speed;
 }
 
 function moveLeftUntilTouch(speed) {
@@ -57,11 +57,11 @@ function moveLeftUntilTouch(speed) {
             player.realUp() < objList[i].realDown() &&
             player.realDown() > objList[i].realUp()) {
             return objList[i].realRight() - player.leftGap;
-        } else if (player.realLeft() - speed < endOfStage.left) {
-            return endOfStage.left - player.leftGap;
+        } else if (player.left() - speed < endOfStage.left) {
+            return endOfStage.left;
         }
     }
-    return player.realLeft() - speed - player.leftGap;
+    return player.left() - speed;
 }
 
 function moveRightUntilTouch(speed) {
@@ -72,9 +72,9 @@ function moveRightUntilTouch(speed) {
             player.realUp() < objList[i].realDown() &&
             player.realDown() > objList[i].realUp()) {
             return objList[i].realLeft() - player.realWidth() - player.leftGap;
-        } else if (player.realRight() + speed > endOfStage.right) {
-            return endOfStage.right - player.realWidth() - player.leftGap;
+        } else if (player.right() + speed >= endOfStage.right) {
+            return endOfStage.right - player.width;
         }
     }
-    return player.realLeft() + speed - player.leftGap;
+    return player.left() + speed;
 }
