@@ -19,7 +19,7 @@ function Game_init() {
     document.getElementById("bgmTitle").currentTime = 0;
     document.getElementById("bgmGame").play();
 
-    gameCamera.zoom = 1.0;
+    gameCamera.zoom = 2.0;
 
     let playerImgList = [document.getElementById("playerLeft"), document.getElementById("playerRight")];
 
@@ -182,7 +182,7 @@ function Game_pressingT() {
 function Game_firstPressZ() {
 }
 function Game_pressingZ() {
-    if (gameCamera.zoom < 3) {
+    if (gameCamera.zoom < 8) {
         gameCamera.zoom *= 1.01;
     }
 }

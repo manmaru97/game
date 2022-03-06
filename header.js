@@ -152,8 +152,6 @@ let gameCamera = {
     zoom: undefined,
 };
 
-let mulZoom = undefined;
-
 // ステージの端
 let endOfStage = {
     up: 0,
@@ -169,9 +167,9 @@ document.getElementById("attack").volume = 1;
 
 function chaseAndDrawImage(obj, i) {
     ctx.drawImage(obj.img[i],
-        ((obj.left() - gameCamera.x) * mulZoom + canvas.width / 2),
-        ((obj.up() - gameCamera.y) * mulZoom + canvas.height / 2),
-        obj.width * mulZoom, obj.height * mulZoom);
+        ((obj.left() - gameCamera.x) * gameCamera.zoom + virtualSize.width / 2),
+        ((obj.up() - gameCamera.y) * gameCamera.zoom + virtualSize.height / 2),
+        obj.width * gameCamera.zoom, obj.height * gameCamera.zoom);
 }
 
 function repaint() {
@@ -180,8 +178,6 @@ function repaint() {
 
     ctx.save();
     ctx.scale(canvas.width / virtualSize.width, canvas.height / virtualSize.height);
-
-    mulZoom = virtualSize.width * gameCamera.zoom;
 
     if (nowScene === scene.title) {
         ctx.drawImage(titleBack.img[0], titleBack.left(), titleBack.up(), titleBack.width, titleBack.height);
@@ -194,28 +190,25 @@ function repaint() {
             ctx.fillRect(100, 300, 100, 100);
         }
     } else if (nowScene === scene.game) {
-        // カメラ
-        gameCamera.x = player.centerX();
-        gameCamera.y = player.centerX();
-
-        // if (endOfStage.right * mulZoom < canvas.width) {
-        //     gameCamera.x = endOfStage.right / 2;
-        // } else if (player.centerX() <= (canvas.width / 2) / mulZoom) {
-        //     gameCamera.x = (canvas.width / 2) / mulZoom;
-        // } else if (player.centerX() >= endOfStage.right - (canvas.width / 2) / mulZoom) {
-        //     gameCamera.x = endOfStage.right - (canvas.width / 2) / mulZoom;
-        // } else {
-        //     gameCamera.x = player.centerX();
-        // }
-        // if (endOfStage.down * mulZoom < canvas.height) {
-        //     gameCamera.y = endOfStage.down / 2;
-        // } else if (player.centerY() <= (canvas.height / 2) / mulZoom) {
-        //     gameCamera.y = (canvas.height / 2) / mulZoom;
-        // } else if (player.centerY() >= endOfStage.down - (canvas.height / 2) / mulZoom) {
-        //     gameCamera.y = endOfStage.down - (canvas.height / 2) / mulZoom;
-        // } else {
-        //     gameCamera.y = player.centerY();
-        // }
+        // 画面端の処理
+        if (endOfStage.right * gameCamera.zoom < virtualSize.width) {
+            gameCamera.x = endOfStage.right / 2;
+        } else if (player.centerX() <= (virtualSize.width / 2) / gameCamera.zoom) {
+            gameCamera.x = (virtualSize.width / 2) / gameCamera.zoom;
+        } else if (player.centerX() >= endOfStage.right - (virtualSize.width / 2) / gameCamera.zoom) {
+            gameCamera.x = endOfStage.right - (virtualSize.width / 2) / gameCamera.zoom;
+        } else {
+            gameCamera.x = player.centerX();
+        }
+        if (endOfStage.down * gameCamera.zoom < virtualSize.height) {
+            gameCamera.y = endOfStage.down / 2;
+        } else if (player.centerY() <= (virtualSize.height / 2) / gameCamera.zoom) {
+            gameCamera.y = (virtualSize.height / 2) / gameCamera.zoom;
+        } else if (player.centerY() >= endOfStage.down - (virtualSize.height / 2) / gameCamera.zoom) {
+            gameCamera.y = endOfStage.down - (virtualSize.height / 2) / gameCamera.zoom;
+        } else {
+            gameCamera.y = player.centerY();
+        }
 
         // 黒背景
         ctx.drawImage(gameBack.img[0], gameBack.left(), gameBack.up(), gameBack.width, gameBack.height);
