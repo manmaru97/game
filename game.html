@@ -9,21 +9,40 @@
 </head>
 
 <body>
-    <audio src="mp3/Acoustic18.mp3" id="bgmTitle" loop="loop"></audio>
-    <audio src="mp3/Fantasy05.mp3" id="bgmGame" loop="loop"></audio>
-    <audio src="mp3/jump.mp3" id="jump"></audio>
-    <audio src="mp3/attack.mp3" id="attack"></audio>
-    <img id="black" src="image/black.png" style="display: none;">
+    <audio src="mp3/maoudamashii_title.mp3" id="bgmTitle" loop="loop"></audio>
+    <audio src="mp3/maoudamashii_game.mp3" id="bgmGame" loop="loop"></audio>
+    <audio src="mp3/maoudamashii_jump.mp3" id="jump"></audio>
+    <audio src="mp3/maoudamashii_attack.mp3" id="attack"></audio>
+    <img id="gameBack" src="image/black.png" style="display: none;">
     <img id="title" src="image/backImageTitle.png" style="display: none;">
-    <img id="game" src="image/backImageGame.png" style="display: none;">
+    <img id="gameBack_0" src="image/backImageGame.png" style="display: none;">
     <img id="playerLeft" src="image/playerLeft.png" style="display: none;">
     <img id="playerRight" src="image/playerRight.png" style="display: none;">
     <img id="blockSoft" src="image/blockSoft.png" style="display: none;">
     <img id="board" src="image/board.png" style="display: none;">
-    <canvas id="canvas" width="1024" height="576"></canvas>
+    <canvas id="canvas"></canvas>
+    <div id="upDiv">
+        <nobr>
+            保存済みのステージデータを選択してください
+        </nobr>
+        <br><br>
+        <nobr>
+            <input id="upload" name="upload" type="file">
+            <button>タイトルに戻る</button>
+        </nobr>
+    </div>
+    <div id="downDiv">
+        <nobr>
+            作成したステージデータを保存しますか？
+        </nobr>
+        <br><br>
+        <nobr>
+            <a id="download" download="stage.txt"><button>ファイルを保存</button></a>
+            <button>タイトルに戻る</button>
+        </nobr>
+    </div>
     <script src="enum.js"></script>
     <script src="header.js"></script>
-    <script src="stage.js"></script>
     <script src="scriptTitle.js"></script>
     <script src="scriptGame_move.js"></script>
     <script src="scriptGame.js"></script>

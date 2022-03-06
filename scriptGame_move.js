@@ -20,10 +20,10 @@ function moveUpUntilTouch(speed) {
             player.realUp() >= objList[i].realDown() &&
             player.realLeft() < objList[i].realRight() &&
             player.realRight() > objList[i].realLeft()) {
-            player.jumpFlag = false;
-            return objList[i].realDown() - player.upGap;
+            player.actionFlag = undefined;
+            return objList[i].realDown() - player.upMargin;
         } else if (player.up() - speed < endOfStage.up) {
-            player.jumpFlag = false;
+            player.actionFlag = undefined;
             return endOfStage.up;
         }
     }
@@ -41,7 +41,7 @@ function moveDownUntilTouch(speed) {
             player.realDown() <= objList[i].realUp() &&
             player.realLeft() < objList[i].realRight() &&
             player.realRight() > objList[i].realLeft()) {
-            return objList[i].realUp() - player.realHeight() - player.upGap;
+            return objList[i].realUp() - player.realHeight() - player.upMargin;
         } else if (player.down() + speed >= endOfStage.down) {
             return endOfStage.down - player.height;
         }
@@ -56,7 +56,7 @@ function moveLeftUntilTouch(speed) {
             player.realLeft() >= objList[i].realRight() &&
             player.realUp() < objList[i].realDown() &&
             player.realDown() > objList[i].realUp()) {
-            return objList[i].realRight() - player.leftGap;
+            return objList[i].realRight() - player.leftMargin;
         } else if (player.left() - speed < endOfStage.left) {
             return endOfStage.left;
         }
@@ -71,7 +71,7 @@ function moveRightUntilTouch(speed) {
             player.realRight() <= objList[i].realLeft() &&
             player.realUp() < objList[i].realDown() &&
             player.realDown() > objList[i].realUp()) {
-            return objList[i].realLeft() - player.realWidth() - player.leftGap;
+            return objList[i].realLeft() - player.realWidth() - player.leftMargin;
         } else if (player.right() + speed >= endOfStage.right) {
             return endOfStage.right - player.width;
         }

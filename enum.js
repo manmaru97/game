@@ -11,6 +11,14 @@ let keyPress = {
     pressed: Symbol(),
 };
 
+// タイトル画面のカーソルのenum
+let currentTitleCursor = {
+    mainGame: Symbol(),
+    myGame: Symbol(),
+    stageEdit: Symbol(),
+    edit: Symbol(),
+};
+
 // オブジェクトのタイプのenum
 let typeName = {
     player: Symbol(),
@@ -36,8 +44,7 @@ let direction = {
 
 // プレイヤーの行動のenum
 let action = {
-    stop: Symbol(),
-    walk: Symbol(),
-    jump: Symbol(),
-    down: Symbol(),
+    jump: Symbol(),    
+    attack: Symbol(),    
+    kick: Symbol(),    
 };

@@ -2,10 +2,62 @@
 
 // キャンバス
 const canvas = document.getElementById("canvas");
-const ctx = canvas.getContext("2d");
+const ctx = canvas.getContext("2d", { alpha: true });
+
+// 仮想サイズ
+const virtualSize = {
+    width: 1920,
+    height: 1080,
+};
+
+// true = 動的にキャンバスサイズを変更する
+let autoSetCanvasSize = true;
+
+// ファイルのアップロード/ダウンロードボタンを非表示にする
+document.getElementById("upDiv").style.display = "none";
+document.getElementById("downDiv").style.display = "none";
+
+// 自作ステージのアップロードに用いるマップ
+let map = [];
+let tmpMap = [];
+let tmpStr = "";
+
+// ファイル入力
+let file = document.getElementById("upload");
+let result = undefined;
+let reader = new FileReader();
+reader.addEventListener("load", function () {
+    result = reader.result.replace(/(\n|\r)/g, ""); // 改行文字を削除して代入
+    for (let i = 0; i < result.length; i++) {
+        if (result[i] === "#") {
+            map = [];
+            tmpMap = [];
+            tmpStr = "";
+        } else if (result[i] === "[") {
+            // 何もしない
+        } else if (result[i] === "]") {
+            tmpMap.push(tmpStr);
+            map.push(tmpMap);
+            tmpStr = "";
+            tmpMap = [];
+        } else if (result[i] === ",") {
+            tmpMap.push(tmpStr);
+            tmpStr = "";
+        } else {
+            tmpStr = + result[i];
+        }
+    }
+}, false);
+reader.addEventListener("error", function () {
+    result = undefined;
+}, false);
+
+// ファイル出力
+let blob;
+let output;
 
 // 入力判定
-let pressSpace = keyPress.up;   // 押されていない
+let pressSpace = keyPress.up;   // up = 押されていない
 let pressUp = keyPress.up;
 let pressDown = keyPress.up;
 let pressLeft = keyPress.up;
@@ -29,19 +81,17 @@ let nowScene = undefined;
 // オブジェクトの要素
 class Obj {
 
-    constructor(type, img, x, y, width, height, upGap, downGap, leftGap, rightGap, isExist) {
+    constructor(type, img, x, y, width, height, upMargin, downMargin, leftMargin, rightMargin, isExist) {
         this.type = type;
         this.img = img;
-        this.img2 = undefined;
-        this.img3 = undefined;
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
-        this.upGap = upGap;
-        this.downGap = downGap;
-        this.leftGap = leftGap;
-        this.rightGap = rightGap;
+        this.upMargin = upMargin;
+        this.downMargin = downMargin;
+        this.leftMargin = leftMargin;
+        this.rightMargin = rightMargin;
         this.isExist = isExist;
         this.init();
     }
@@ -55,12 +105,12 @@ class Obj {
     centerX() { return (this.x + this.width / 2); }
     centerY() { return (this.y + this.height / 2); }
 
-    realUp() { return (this.y + this.upGap); }
-    realDown() { return (this.y + this.height - this.downGap); }
-    realLeft() { return (this.x + this.leftGap); }
-    realRight() { return (this.x + this.width - this.rightGap); }
-    realWidth() { return (this.width - this.leftGap - this.rightGap); }
-    realHeight() { return (this.height - this.upGap - this.downGap); }
+    realUp() { return (this.y + this.upMargin); }
+    realDown() { return (this.y + this.height - this.downMargin); }
+    realLeft() { return (this.x + this.leftMargin); }
+    realRight() { return (this.x + this.width - this.rightMargin); }
+    realWidth() { return (this.width - this.leftMargin - this.rightMargin); }
+    realHeight() { return (this.height - this.upMargin - this.downMargin); }
 
 }
 
@@ -74,11 +124,9 @@ class Player extends Obj {
         this.downMaxSpeed = 8;
         this.downAcceleration = 0.4;
         this.horizontalSpeed = 0.4;
-        this.horizontalMaxSpeed = 8;
+        this.horizontalMaxSpeed = 6;
         this.horizontalAcceleration = 0.4;
-        this.jumpFlag = false;
-        this.jumpTimer = undefined;
-        this.actionFlag = false;
+        this.actionFlag = undefined;
         this.actionTimer = undefined;
         this.leftTimer = undefined;
         this.rightTimer = undefined;
@@ -86,19 +134,25 @@ class Player extends Obj {
 }
 
 // オブジェクトの配列
-let titleBackList = [];
+let titleBack = undefined;
+let gameBack = undefined;
 let gameBackList = [];
 let objList = [];
+
+// カーソル
+let titleCursor = undefined;
 
 // プレイヤー
 let player = undefined;
 
 // カメラ
-let camera = {
+let gameCamera = {
     x: undefined,
     y: undefined,
     zoom: undefined,
 };
+
+let mulZoom = undefined;
 
 // ステージの端
 let endOfStage = {
@@ -113,71 +167,90 @@ document.getElementById("bgmGame").volume = 0.5;
 document.getElementById("jump").volume = 1;
 document.getElementById("attack").volume = 1;
 
+function chaseAndDrawImage(obj, i) {
+    ctx.drawImage(obj.img[i],
+        ((obj.left() - gameCamera.x) * mulZoom + canvas.width / 2),
+        ((obj.up() - gameCamera.y) * mulZoom + canvas.height / 2),
+        obj.width * mulZoom, obj.height * mulZoom);
+}
+
 function repaint() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    ctx.save();
+    ctx.scale(canvas.width / virtualSize.width, canvas.height / virtualSize.height);
+
+    mulZoom = virtualSize.width * gameCamera.zoom;
+
     if (nowScene === scene.title) {
-        for (let i = 0; i < titleBackList.length; i++) {
-            if (titleBackList[i].isExist === true) {
-                ctx.drawImage(titleBackList[i].img, titleBackList[i].left(), titleBackList[i].up(), titleBackList[i].width, titleBackList[i].height);
-            }
+        ctx.drawImage(titleBack.img[0], titleBack.left(), titleBack.up(), titleBack.width, titleBack.height);
+        ctx.fillStyle = "rgba(255, 255, 0, 0.5)";
+        if (titleCursor === currentTitleCursor.mainGame) {
+            ctx.fillRect(100, 100, 100, 100);
+        } else if (titleCursor === currentTitleCursor.myGame) {
+            ctx.fillRect(100, 200, 100, 100);
+        } else if (titleCursor === currentTitleCursor.stageEdit) {
+            ctx.fillRect(100, 300, 100, 100);
         }
     } else if (nowScene === scene.game) {
         // カメラ
-        if (endOfStage.right * camera.zoom < canvas.width) {
-            camera.x = endOfStage.right / 2;
-        } else if (player.centerX() <= (canvas.width / 2) / camera.zoom) {
-            camera.x = (canvas.width / 2) / camera.zoom;
-        } else if (player.centerX() >= endOfStage.right - (canvas.width / 2) / camera.zoom) {
-            camera.x = endOfStage.right - (canvas.width / 2) / camera.zoom;
-        } else {
-            camera.x = player.centerX();
-        }
-        if (endOfStage.down * camera.zoom < canvas.height) {
-            camera.y = endOfStage.down / 2;
-        } else if (player.centerY() <= (canvas.height / 2) / camera.zoom) {
-            camera.y = (canvas.height / 2) / camera.zoom;
-        } else if (player.centerY() >= endOfStage.down - (canvas.height / 2) / camera.zoom) {
-            camera.y = endOfStage.down - (canvas.height / 2) / camera.zoom;
-        } else {
-            camera.y = player.centerY();
-        }
+        gameCamera.x = player.centerX();
+        gameCamera.y = player.centerX();
+
+        // if (endOfStage.right * mulZoom < canvas.width) {
+        //     gameCamera.x = endOfStage.right / 2;
+        // } else if (player.centerX() <= (canvas.width / 2) / mulZoom) {
+        //     gameCamera.x = (canvas.width / 2) / mulZoom;
+        // } else if (player.centerX() >= endOfStage.right - (canvas.width / 2) / mulZoom) {
+        //     gameCamera.x = endOfStage.right - (canvas.width / 2) / mulZoom;
+        // } else {
+        //     gameCamera.x = player.centerX();
+        // }
+        // if (endOfStage.down * mulZoom < canvas.height) {
+        //     gameCamera.y = endOfStage.down / 2;
+        // } else if (player.centerY() <= (canvas.height / 2) / mulZoom) {
+        //     gameCamera.y = (canvas.height / 2) / mulZoom;
+        // } else if (player.centerY() >= endOfStage.down - (canvas.height / 2) / mulZoom) {
+        //     gameCamera.y = endOfStage.down - (canvas.height / 2) / mulZoom;
+        // } else {
+        //     gameCamera.y = player.centerY();
+        // }
+
         // 黒背景
+        ctx.drawImage(gameBack.img[0], gameBack.left(), gameBack.up(), gameBack.width, gameBack.height);
+        // 通常背景
         for (let i = 0; i < gameBackList.length; i++) {
             if (gameBackList[i].isExist === true) {
-                if (gameBackList[i].type === typeName.black) {
-                    ctx.drawImage(gameBackList[i].img, gameBackList[i].left(), gameBackList[i].up(), gameBackList[i].width, gameBackList[i].height);
-                } else if (gameBackList[i].type === typeName.gameBack) {
-                    ctx.drawImage(gameBackList[i].img,
-                        ((gameBackList[i].left() - camera.x) * camera.zoom + canvas.width / 2),
-                        ((gameBackList[i].up() - camera.y) * camera.zoom + canvas.height / 2),
-                        gameBackList[i].width * camera.zoom, gameBackList[i].height * camera.zoom);
-                }
+                chaseAndDrawImage(gameBackList[i], 0);
             }
         }
         // オブジェクト
         for (let i = 0; i < objList.length; i++) {
             if (objList[i].isExist === true) {
-                ctx.drawImage(objList[i].img,
-                    ((objList[i].left() - camera.x) * camera.zoom + canvas.width / 2),
-                    ((objList[i].up() - camera.y) * camera.zoom + canvas.height / 2),
-                    objList[i].width * camera.zoom, objList[i].height * camera.zoom);
+                chaseAndDrawImage(objList[i], 0);
             }
         }
         // プレイヤー
         if (player.isExist === true) {
             if (player.direction === direction.left) {
-                ctx.drawImage(player.img,
-                    ((player.left() - camera.x) * camera.zoom + canvas.width / 2),
-                    ((player.up() - camera.y) * camera.zoom + canvas.height / 2),
-                    player.width * camera.zoom, player.height * camera.zoom);
+                chaseAndDrawImage(player, 0);
             } else {
-                ctx.drawImage(player.img2,
-                    ((player.left() - camera.x) * camera.zoom + canvas.width / 2),
-                    ((player.up() - camera.y) * camera.zoom + canvas.height / 2),
-                    player.width * camera.zoom, player.height * camera.zoom);
+                chaseAndDrawImage(player, 1);
             }
         }
+    }
+
+    ctx.restore();
+
+}
+
+function changeCanvasSize() {
+    if (window.innerWidth <= window.innerHeight * 16 / 9) {
+        canvas.setAttribute("width", window.innerWidth);
+        canvas.setAttribute("height", window.innerWidth * 9 / 16);
+    } else {
+        canvas.setAttribute("width", window.innerHeight * 16 / 9);
+        canvas.setAttribute("height", window.innerHeight);
     }
 }
