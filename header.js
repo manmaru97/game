@@ -13,10 +13,6 @@ const virtualSize = {
 // true = 動的にキャンバスサイズを変更する
 let autoSetCanvasSize = true;
 
-// ファイルのアップロード/ダウンロードボタンを非表示にする
-document.getElementById("upDiv").style.display = "none";
-document.getElementById("downDiv").style.display = "none";
-
 // 自作ステージのアップロードに用いるマップ
 let map = [];
 let tmpMap = [];
